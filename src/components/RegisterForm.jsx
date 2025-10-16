@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 
 function RegisterForm() {
   const [userDetails, setUserDetails] = useState({
@@ -11,6 +11,9 @@ function RegisterForm() {
 
   const [errors, setErrors] = useState({});
 
+  const navigate = useNavigate();
+
+  //validation rules
   const formValidationRules = {
     username: [
       {
@@ -18,11 +21,11 @@ function RegisterForm() {
         message: "Please enter a username.",
       },
       {
-        minlength: 3,
+        minLength: 3,
         message: "Username must be at least 3 characters long.",
       },
       {
-        maxlength: 30,
+        maxLength: 30,
         message: "Username cannot be longer than 30 characters.",
       },
     ],
@@ -33,11 +36,11 @@ function RegisterForm() {
         message: "Please enter your phone number.",
       },
       {
-        minlength: 10,
+        minLength: 10,
         message: "Phone number must be 10 digits long.",
       },
       {
-        maxlength: 10,
+        maxLength: 10,
         message: "Phone number must be 10 digits long.",
       },
       {
@@ -52,11 +55,11 @@ function RegisterForm() {
         message: "Please enter a password.",
       },
       {
-        minlength: 6,
+        minLength: 6,
         message: "Password must be at least 6 characters long.",
       },
       {
-        maxlength: 20,
+        maxLength: 20,
         message: "Password cannot exceed 20 characters.",
       },
       {
@@ -73,21 +76,28 @@ function RegisterForm() {
     ],
   };
 
+  //validation function
   const validation = (formData) => {
+
     const errorData = {};
+
     Object.entries(formData).forEach(([key, value]) => {
+
+      if (!formValidationRules[key]) return;
+
       formValidationRules[key].some((rule) => {
+
         if (rule.required && !value) {
           errorData[key] = rule.message;
           return true;
         }
 
-        if (rule.minlength && value.length < rule.minlength) {
+        if (rule.minLength && value.length < rule.minLength) {
           errorData[key] = rule.message;
           return true;
         }
 
-        if (rule.maxlength && value.length > rule.maxlength) {
+        if (rule.maxLength && value.length > rule.maxLength) {
           errorData[key] = rule.message;
           return true;
         }
@@ -107,6 +117,7 @@ function RegisterForm() {
     return errorData;
   };
 
+  //submit handler
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -114,22 +125,30 @@ function RegisterForm() {
 
     if (Object.keys(validateResult).length) return;
 
-    console.log(userDetails);
 
+    //avoid storing confirmPassword in localStorage since it's only used for client-side validation and not required for the database.
+    const { confirmPassword, ...userData } = userDetails;
+    localStorage.setItem("user", JSON.stringify(userData));
+
+    //reset form state
     setUserDetails({
       username: "",
       phone: "",
       password: "",
       confirmPassword: "",
     });
+
+    navigate("/login");
   };
 
+  //onChange handler
   const handleChange = (e) => {
     const { name, value } = e.target;
     setUserDetails((prevState) => ({
       ...prevState,
       [name]: value,
     }));
+    setErrors({});
   };
 
   return (
@@ -151,7 +170,7 @@ function RegisterForm() {
             onChange={handleChange}
             className="rounded-md border-none bg-white p-2 text-lg outline-none focus:ring focus:ring-gray-500"
           />
-          {errors && <p className="text-xs text-red-600">{errors.username}</p>}
+          {errors.username && <p className="text-xs text-red-600">{errors.username}</p>}
         </div>
 
         <div className="flex w-full flex-col gap-1">
@@ -163,7 +182,7 @@ function RegisterForm() {
             onChange={handleChange}
             className="rounded-md border-none bg-white p-2 text-lg outline-none focus:ring focus:ring-gray-500"
           />
-          {errors && <p className="text-xs text-red-600">{errors.phone}</p>}
+          {errors.phone && <p className="text-xs text-red-600">{errors.phone}</p>}
         </div>
 
         <div className="flex w-full flex-col gap-1">
@@ -176,7 +195,7 @@ function RegisterForm() {
             autoComplete="off"
             className="rounded-md border-none bg-white p-2 text-lg outline-none focus:ring focus:ring-gray-500"
           />
-          {errors && <p className="text-xs text-red-600">{errors.password}</p>}
+          {errors.password && <p className="text-xs text-red-600">{errors.password}</p>}
         </div>
 
         <div className="flex w-full flex-col gap-1">
@@ -189,7 +208,7 @@ function RegisterForm() {
             autoComplete="off"
             className="rounded-md border-none bg-white p-2 text-lg outline-none focus:ring focus:ring-gray-500"
           />
-          {errors && (
+          {errors.confirmPassword && (
             <p className="text-xs text-red-600">{errors.confirmPassword}</p>
           )}
         </div>

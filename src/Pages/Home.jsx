@@ -1,13 +1,14 @@
-import React from 'react'
-import { Link } from 'react-router'
+import React from "react";
+import { Link } from "react-router";
 
 function Home() {
-    return (
-        <div className='flex justify-end items-center text-xl font-bold p-3'>
-
-            <Link to={'/login'} className='bg-blue-400 p-2 rounded-lg cursor-pointer'>Login</Link>
-        </div>
-    )
+  return (
+    <div className="flex items-center justify-end p-3 text-xl font-bold">
+      <Link to={"/login"} className="cursor-pointer rounded-lg bg-blue-400 p-2">
+        Login
+      </Link>
+    </div>
+  );
 }
 
-export default Home
+export default Home;
